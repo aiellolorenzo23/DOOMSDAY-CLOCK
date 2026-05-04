@@ -74,14 +74,17 @@ function createChaosState(): ChaosState {
 export default function App() {
   const [clockData, setClockData] = useState<ClockData>(FALLBACK_CLOCK_DATA);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSettling, setIsSettling] = useState(false);
   const [chaosState, setChaosState] = useState<ChaosState | null>(null);
   const chaosIntervalRef = useRef<number | null>(null);
+  const settlingTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     void refreshClockData();
 
     return () => {
       stopChaos();
+      stopSettling();
     };
   }, []);
 
@@ -89,6 +92,13 @@ export default function App() {
     if (chaosIntervalRef.current !== null) {
       window.clearInterval(chaosIntervalRef.current);
       chaosIntervalRef.current = null;
+    }
+  }
+
+  function stopSettling() {
+    if (settlingTimeoutRef.current !== null) {
+      window.clearTimeout(settlingTimeoutRef.current);
+      settlingTimeoutRef.current = null;
     }
   }
 
@@ -120,6 +130,12 @@ export default function App() {
         stopChaos();
         setChaosState(null);
         setIsRefreshing(false);
+        setIsSettling(true);
+        stopSettling();
+        settlingTimeoutRef.current = window.setTimeout(() => {
+          setIsSettling(false);
+          settlingTimeoutRef.current = null;
+        }, 1100);
       }
     }
   }
@@ -198,7 +214,10 @@ export default function App() {
             );
           })}
 
-          <g transform={`rotate(${hourAngle} 180 180)`}>
+          <g
+            className={`hand-rotation hour-rotation ${isSettling ? "is-settling" : ""}`}
+            style={{ transform: `rotate(${hourAngle}deg)` }}
+          >
             <g className="hand-wobble hour-wobble">
               <line
                 x1="180"
@@ -212,7 +231,10 @@ export default function App() {
             </g>
           </g>
 
-          <g transform={`rotate(${minuteAngle} 180 180)`}>
+          <g
+            className={`hand-rotation minute-rotation ${isSettling ? "is-settling" : ""}`}
+            style={{ transform: `rotate(${minuteAngle}deg)` }}
+          >
             <g className="hand-wobble minute-wobble">
               <line
                 x1="180"
@@ -226,7 +248,10 @@ export default function App() {
             </g>
           </g>
 
-          <g transform={`rotate(${secondAngle} 180 180)`}>
+          <g
+            className={`hand-rotation second-rotation ${isSettling ? "is-settling" : ""}`}
+            style={{ transform: `rotate(${secondAngle}deg)` }}
+          >
             <g className="hand-wobble second-wobble">
               <line
                 x1="180"

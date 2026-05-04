@@ -309,6 +309,27 @@ body {
   transform-origin: 180px 180px;
 }
 
+.hand-rotation {
+  transform-box: view-box;
+  transform-origin: 180px 180px;
+}
+
+.hand-rotation.is-settling {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hour-rotation.is-settling {
+  transition-duration: 460ms;
+}
+
+.minute-rotation.is-settling {
+  transition-duration: 360ms;
+}
+
+.second-rotation.is-settling {
+  transition-duration: 280ms;
+}
+
 .hour-wobble {
   animation: subtleWobble 4.5s infinite ease-in-out;
 }
@@ -541,6 +562,7 @@ body {
   .clock-card,
   .red-glow,
   .scanlines,
+  .hand-rotation.is-settling,
   .hour-wobble,
   .minute-wobble,
   .second-wobble,
