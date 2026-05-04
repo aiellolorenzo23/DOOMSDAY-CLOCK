@@ -51,22 +51,13 @@ export default function App() {
       <section className="clock-card">
         <div className="scanlines" />
 
-        <h1 className="title">DOOMSDAY CLOCK</h1>
+        <header className="watchmen-title" aria-label="Doomsday Clock">
+          <div className="watchmen-title-main">DOOMSDAY</div>
+          <div className="watchmen-title-sub">CLOCK</div>
+        </header>
 
-        <svg
-          width="360"
-          height="360"
-          viewBox="0 0 360 360"
-          className="analog-clock"
-        >
-          <circle
-            cx="180"
-            cy="180"
-            r="160"
-            fill="none"
-            stroke="black"
-            strokeWidth="10"
-          />
+        <svg width="360" height="360" viewBox="0 0 360 360" className="analog-clock">
+          <circle cx="180" cy="180" r="160" fill="none" stroke="black" strokeWidth="10" />
 
           <circle
             cx="180"
@@ -79,11 +70,11 @@ export default function App() {
           />
 
           {[...Array(12)].map((_, index) => {
-            const angle = index * 30;
-            const rad = ((angle - 90) * Math.PI) / 180;
-            const x = 180 + Math.cos(rad) * 128;
-            const y = 180 + Math.sin(rad) * 128;
-            const label = index === 0 ? 12 : index;
+            const angle = index * 30
+            const rad = ((angle - 90) * Math.PI) / 180
+            const x = 180 + Math.cos(rad) * 128
+            const y = 180 + Math.sin(rad) * 128
+            const label = index === 0 ? 12 : index
 
             return (
               <text
@@ -98,7 +89,7 @@ export default function App() {
               >
                 {label}
               </text>
-            );
+            )
           })}
 
           <g transform={`rotate(${hourAngle} 180 180)`}>
@@ -149,19 +140,12 @@ export default function App() {
 
         <div className="digital-time">{digitalTime}</div>
 
-        <div className="countdown-label">
-          {CLOCK_DATA.secondsToMidnight} seconds to midnight
-        </div>
+        <div className="countdown-label">{CLOCK_DATA.secondsToMidnight} seconds to midnight</div>
 
-        <a
-          className="source"
-          href={CLOCK_DATA.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a className="source" href={CLOCK_DATA.sourceUrl} target="_blank" rel="noreferrer">
           Last update: {CLOCK_DATA.lastUpdated} · {CLOCK_DATA.sourceName}
         </a>
       </section>
     </main>
-  );
+  )
 }
