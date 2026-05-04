@@ -49,6 +49,77 @@ body {
   z-index: -1;
 }
 
+.refresh-button {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 86px;
+  height: 86px;
+  padding: 0;
+  border: 3px solid rgba(245, 196, 0, 0.9);
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.84);
+  box-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(158, 0, 0, 0.22);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+
+.refresh-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    9px 9px 0 rgba(0, 0, 0, 0.5),
+    0 0 32px rgba(158, 0, 0, 0.35);
+}
+
+.refresh-button:disabled {
+  cursor: default;
+}
+
+.refresh-button.is-refreshing {
+  animation: refreshButtonPulse 0.55s infinite steps(2, end);
+}
+
+.refresh-button-icon {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.refresh-button-tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 14px);
+  transform: translateY(-50%) translateX(8px);
+  padding: 0.2rem 0.55rem;
+  border: 2px solid var(--watchmen-yellow);
+  background: rgba(8, 8, 8, 0.92);
+  color: var(--watchmen-yellow);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.refresh-button:hover .refresh-button-tooltip,
+.refresh-button:focus-visible .refresh-button-tooltip,
+.refresh-button.is-refreshing .refresh-button-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
 .clock-card {
   position: relative;
   width: min(680px, calc(100vw - 64px));
@@ -158,6 +229,22 @@ body {
     drop-shadow(0 0 12px rgba(245, 196, 0, 0.22));
 }
 
+.analog-clock.is-refreshing {
+  animation: analogChaos 130ms infinite steps(2, end);
+}
+
+.analog-clock.is-refreshing .hour-wobble {
+  animation: handSpinHour 0.52s infinite linear;
+}
+
+.analog-clock.is-refreshing .minute-wobble {
+  animation: handSpinMinute 0.18s infinite linear;
+}
+
+.analog-clock.is-refreshing .second-wobble {
+  animation: handSpinSecond 0.08s infinite linear;
+}
+
 .clock-number {
   user-select: none;
   fill: var(--ink-black);
@@ -183,6 +270,10 @@ body {
   transform: rotate(0.5deg);
 }
 
+.digital-time.is-refreshing {
+  animation: digitalChaos 90ms infinite steps(2, end);
+}
+
 .countdown-label {
   font-size: clamp(1.1rem, 3vw, 1.7rem);
   letter-spacing: 0.12em;
@@ -190,6 +281,10 @@ body {
   text-transform: uppercase;
   text-align: center;
   text-shadow: 2px 2px 0 rgba(245, 196, 0, 0.28);
+}
+
+.countdown-label.is-refreshing {
+  animation: countdownChaos 95ms infinite steps(2, end);
 }
 
 .source {
@@ -249,6 +344,108 @@ body {
 
   50% {
     transform: rotate(-0.75deg);
+  }
+}
+
+@keyframes analogChaos {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: translate(-2px, 2px) rotate(-0.8deg) scale(1.01);
+  }
+
+  50% {
+    transform: translate(2px, -1px) rotate(0.8deg) scale(0.995);
+  }
+
+  75% {
+    transform: translate(-1px, -2px) rotate(-0.5deg) scale(1.008);
+  }
+}
+
+@keyframes handSpinHour {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes handSpinMinute {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-720deg);
+  }
+}
+
+@keyframes handSpinSecond {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(1440deg);
+  }
+}
+
+@keyframes digitalChaos {
+  0%,
+  100% {
+    transform: rotate(0.5deg) translateX(0);
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+
+  33% {
+    transform: rotate(-0.8deg) translateX(-3px);
+    text-shadow:
+      2px 0 0 rgba(255, 0, 0, 0.6),
+      -2px 0 0 rgba(255, 234, 0, 0.45);
+  }
+
+  66% {
+    transform: rotate(0.8deg) translateX(3px);
+    text-shadow:
+      -2px 0 0 rgba(255, 0, 0, 0.55),
+      2px 0 0 rgba(255, 234, 0, 0.45);
+  }
+}
+
+@keyframes countdownChaos {
+  0%,
+  100% {
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+  }
+
+  40% {
+    transform: translateX(-3px) skewX(-10deg);
+    opacity: 0.84;
+  }
+
+  70% {
+    transform: translateX(3px) skewX(10deg);
+    opacity: 1;
+  }
+}
+
+@keyframes refreshButtonPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    border-color: rgba(245, 196, 0, 0.9);
+  }
+
+  50% {
+    transform: scale(1.04);
+    border-color: rgba(158, 0, 0, 0.95);
   }
 }
 
@@ -340,12 +537,20 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .refresh-button,
   .clock-card,
   .red-glow,
   .scanlines,
   .hour-wobble,
   .minute-wobble,
-  .second-wobble {
+  .second-wobble,
+  .analog-clock.is-refreshing,
+  .analog-clock.is-refreshing .hour-wobble,
+  .analog-clock.is-refreshing .minute-wobble,
+  .analog-clock.is-refreshing .second-wobble,
+  .digital-time.is-refreshing,
+  .countdown-label.is-refreshing,
+  .refresh-button.is-refreshing {
     animation: none;
   }
 }

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import refreshIcon from "./assets/icon.svg";
 import "./assets/main.css";
 
 const FALLBACK_CLOCK_DATA = {
@@ -9,6 +10,18 @@ const FALLBACK_CLOCK_DATA = {
 };
 
 type ClockData = typeof FALLBACK_CLOCK_DATA;
+
+type ClockAngles = {
+  hourAngle: number;
+  minuteAngle: number;
+  secondAngle: number;
+};
+
+type ChaosState = {
+  digitalTime: string;
+  countdown: number;
+  angles: ClockAngles;
+};
 
 function getClockTimeFromSecondsToMidnight(secondsToMidnight: number): string {
   const totalSecondsInDay = 24 * 60 * 60;
@@ -23,7 +36,7 @@ function getClockTimeFromSecondsToMidnight(secondsToMidnight: number): string {
     .join(":");
 }
 
-function getHandAngles(secondsToMidnight: number) {
+function getHandAngles(secondsToMidnight: number): ClockAngles {
   const totalSecondsInDay = 24 * 60 * 60;
   const clockSeconds = totalSecondsInDay - secondsToMidnight;
 
@@ -38,41 +51,103 @@ function getHandAngles(secondsToMidnight: number) {
   };
 }
 
+function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * max);
+}
+
+function createChaosState(): ChaosState {
+  const hours = String(getRandomInt(24)).padStart(2, "0");
+  const minutes = String(getRandomInt(60)).padStart(2, "0");
+  const seconds = String(getRandomInt(60)).padStart(2, "0");
+
+  return {
+    digitalTime: `${hours}:${minutes}:${seconds}`,
+    countdown: getRandomInt(360),
+    angles: {
+      hourAngle: getRandomInt(360),
+      minuteAngle: getRandomInt(360),
+      secondAngle: getRandomInt(360)
+    }
+  };
+}
+
 export default function App() {
   const [clockData, setClockData] = useState<ClockData>(FALLBACK_CLOCK_DATA);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [chaosState, setChaosState] = useState<ChaosState | null>(null);
+  const chaosIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-
-    window.api
-      .getDoomsdayClockData()
-      .then((data) => {
-        if (isMounted) {
-          setClockData(data);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setClockData(FALLBACK_CLOCK_DATA);
-        }
-      });
+    void refreshClockData();
 
     return () => {
-      isMounted = false;
+      stopChaos();
     };
   }, []);
 
-  const digitalTime = getClockTimeFromSecondsToMidnight(
-    clockData.secondsToMidnight
-  );
+  function stopChaos() {
+    if (chaosIntervalRef.current !== null) {
+      window.clearInterval(chaosIntervalRef.current);
+      chaosIntervalRef.current = null;
+    }
+  }
 
-  const { hourAngle, minuteAngle, secondAngle } = getHandAngles(
-    clockData.secondsToMidnight
-  );
+  function startChaos() {
+    setChaosState(createChaosState());
+    stopChaos();
+    chaosIntervalRef.current = window.setInterval(() => {
+      setChaosState(createChaosState());
+    }, 70);
+  }
+
+  async function refreshClockData(withChaos = false) {
+    if (isRefreshing) {
+      return;
+    }
+
+    if (withChaos) {
+      setIsRefreshing(true);
+      startChaos();
+    }
+
+    try {
+      const data = await window.api.getDoomsdayClockData();
+      setClockData(data);
+    } catch {
+      setClockData(FALLBACK_CLOCK_DATA);
+    } finally {
+      if (withChaos) {
+        stopChaos();
+        setChaosState(null);
+        setIsRefreshing(false);
+      }
+    }
+  }
+
+  const displayedDigitalTime =
+    chaosState?.digitalTime ??
+    getClockTimeFromSecondsToMidnight(clockData.secondsToMidnight);
+
+  const displayedCountdown = chaosState?.countdown ?? clockData.secondsToMidnight;
+  const { hourAngle, minuteAngle, secondAngle } =
+    chaosState?.angles ?? getHandAngles(clockData.secondsToMidnight);
 
   return (
     <main className="app">
       <div className="red-glow" />
+
+      <button
+        type="button"
+        className={`refresh-button ${isRefreshing ? "is-refreshing" : ""}`}
+        onClick={() => void refreshClockData(true)}
+        aria-label={isRefreshing ? "refreshing" : "refresh"}
+        disabled={isRefreshing}
+      >
+        <img src={refreshIcon} alt="" className="refresh-button-icon" />
+        <span className="refresh-button-tooltip">
+          {isRefreshing ? "refreshing" : "refresh"}
+        </span>
+      </button>
 
       <section className="clock-card">
         <div className="scanlines" />
@@ -82,7 +157,12 @@ export default function App() {
           <div className="watchmen-title-sub">CLOCK</div>
         </header>
 
-        <svg width="360" height="360" viewBox="0 0 360 360" className="analog-clock">
+        <svg
+          width="360"
+          height="360"
+          viewBox="0 0 360 360"
+          className={`analog-clock ${isRefreshing ? "is-refreshing" : ""}`}
+        >
           <circle cx="180" cy="180" r="160" fill="none" stroke="black" strokeWidth="10" />
 
           <circle
@@ -164,9 +244,13 @@ export default function App() {
           <circle cx="180" cy="180" r="4" fill="#9e0000" />
         </svg>
 
-        <div className="digital-time">{digitalTime}</div>
+        <div className={`digital-time ${isRefreshing ? "is-refreshing" : ""}`}>
+          {displayedDigitalTime}
+        </div>
 
-        <div className="countdown-label">{clockData.secondsToMidnight} seconds to midnight</div>
+        <div className={`countdown-label ${isRefreshing ? "is-refreshing" : ""}`}>
+          {displayedCountdown} seconds to midnight
+        </div>
 
         <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
           Last update: {clockData.lastUpdated} · {clockData.sourceName}
