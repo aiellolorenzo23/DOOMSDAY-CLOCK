@@ -169,12 +169,12 @@ export default function App() {
         type="button"
         className={`refresh-button ${isRefreshing ? "is-refreshing" : ""}`}
         onClick={() => void refreshClockData(true)}
-        aria-label={isRefreshing ? "refreshing" : "refresh"}
+        aria-label={isRefreshing ? "ticks..." : "refresh"}
         disabled={isRefreshing}
       >
         <img src={refreshIcon} alt="" className="refresh-button-icon" />
         <span className="refresh-button-tooltip">
-          {isRefreshing ? "refreshing" : "refresh"}
+          {isRefreshing ? "ticks..." : "refresh"}
         </span>
       </button>
 
