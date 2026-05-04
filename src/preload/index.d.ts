@@ -5,6 +5,7 @@ type ClockData = {
   lastUpdated: string
   sourceName: string
   sourceUrl: string
+  fetchState: 'live' | 'cached' | 'fallback'
 }
 
 declare global {

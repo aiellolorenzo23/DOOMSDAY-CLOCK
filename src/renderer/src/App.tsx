@@ -6,7 +6,8 @@ const FALLBACK_CLOCK_DATA = {
   secondsToMidnight: 85,
   lastUpdated: "2026-01-27",
   sourceName: "Bulletin of the Atomic Scientists",
-  sourceUrl: "https://thebulletin.org/doomsday-clock/current-time/"
+  sourceUrl: "https://thebulletin.org/doomsday-clock/current-time/",
+  fetchState: "fallback"
 };
 
 type ClockData = typeof FALLBACK_CLOCK_DATA;
@@ -69,6 +70,18 @@ function createChaosState(): ChaosState {
       secondAngle: getRandomInt(360)
     }
   };
+}
+
+function getFetchStateLabel(fetchState: ClockData["fetchState"]): string {
+  if (fetchState === "live") {
+    return "live";
+  }
+
+  if (fetchState === "cached") {
+    return "cached";
+  }
+
+  return "fallback";
 }
 
 export default function App() {
@@ -277,9 +290,14 @@ export default function App() {
           {displayedCountdown} seconds to midnight
         </div>
 
-        <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
-          Last update: {clockData.lastUpdated} · {clockData.sourceName}
-        </a>
+        <div className="source-row">
+          <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
+            Last update: {clockData.lastUpdated} · {clockData.sourceName}
+          </a>
+          <span className={`source-status is-${clockData.fetchState}`}>
+            {getFetchStateLabel(clockData.fetchState)}
+          </span>
+        </div>
       </section>
     </main>
   );

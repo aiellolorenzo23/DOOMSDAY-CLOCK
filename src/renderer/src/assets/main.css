@@ -299,6 +299,42 @@ body {
   border: 2px solid rgba(8, 8, 8, 0.35);
 }
 
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.source-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  padding: 0.18rem 0.55rem;
+  border: 2px solid rgba(8, 8, 8, 0.45);
+  background: rgba(8, 8, 8, 0.88);
+  color: var(--watchmen-yellow);
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.source-status.is-live {
+  color: #ffe36e;
+}
+
+.source-status.is-cached {
+  color: #ffb347;
+}
+
+.source-status.is-fallback {
+  color: #ff7b5f;
+}
+
 .source:hover {
   opacity: 1;
   text-decoration: underline;

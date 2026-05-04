@@ -11,13 +11,15 @@ type ClockData = {
   lastUpdated: string
   sourceName: string
   sourceUrl: string
+  fetchState: 'live' | 'cached' | 'fallback'
 }
 
 const FALLBACK_CLOCK_DATA: ClockData = {
   secondsToMidnight: 85,
   lastUpdated: '2026-01-27',
   sourceName: 'Bulletin of the Atomic Scientists',
-  sourceUrl: DOOMSDAY_CLOCK_URL
+  sourceUrl: DOOMSDAY_CLOCK_URL,
+  fetchState: 'fallback'
 }
 
 function getClockCachePath(): string {
@@ -42,7 +44,8 @@ async function readCachedClockData(): Promise<ClockData | null> {
       secondsToMidnight: parsedData.secondsToMidnight,
       lastUpdated: parsedData.lastUpdated,
       sourceName: parsedData.sourceName,
-      sourceUrl: parsedData.sourceUrl
+      sourceUrl: parsedData.sourceUrl,
+      fetchState: 'cached'
     }
   } catch {
     return null
@@ -90,7 +93,8 @@ function extractClockDataFromHtml(html: string): ClockData | null {
     secondsToMidnight,
     lastUpdated: parsedDate.toISOString().slice(0, 10),
     sourceName: 'Bulletin of the Atomic Scientists',
-    sourceUrl: DOOMSDAY_CLOCK_URL
+    sourceUrl: DOOMSDAY_CLOCK_URL,
+    fetchState: 'live'
   }
 }
 
