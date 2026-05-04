@@ -1,11 +1,14 @@
+import { useEffect, useState } from "react";
 import "./assets/main.css";
 
-const CLOCK_DATA = {
+const FALLBACK_CLOCK_DATA = {
   secondsToMidnight: 85,
   lastUpdated: "2026-01-27",
   sourceName: "Bulletin of the Atomic Scientists",
-  sourceUrl: "https://thebulletin.org/doomsday-clock/"
+  sourceUrl: "https://thebulletin.org/doomsday-clock/current-time/"
 };
+
+type ClockData = typeof FALLBACK_CLOCK_DATA;
 
 function getClockTimeFromSecondsToMidnight(secondsToMidnight: number): string {
   const totalSecondsInDay = 24 * 60 * 60;
@@ -16,7 +19,7 @@ function getClockTimeFromSecondsToMidnight(secondsToMidnight: number): string {
   const seconds = clockSeconds % 60;
 
   return [hours, minutes, seconds]
-    .map(value => String(value).padStart(2, "0"))
+    .map((value) => String(value).padStart(2, "0"))
     .join(":");
 }
 
@@ -36,12 +39,35 @@ function getHandAngles(secondsToMidnight: number) {
 }
 
 export default function App() {
+  const [clockData, setClockData] = useState<ClockData>(FALLBACK_CLOCK_DATA);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    window.api
+      .getDoomsdayClockData()
+      .then((data) => {
+        if (isMounted) {
+          setClockData(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setClockData(FALLBACK_CLOCK_DATA);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const digitalTime = getClockTimeFromSecondsToMidnight(
-    CLOCK_DATA.secondsToMidnight
+    clockData.secondsToMidnight
   );
 
   const { hourAngle, minuteAngle, secondAngle } = getHandAngles(
-    CLOCK_DATA.secondsToMidnight
+    clockData.secondsToMidnight
   );
 
   return (
@@ -70,11 +96,11 @@ export default function App() {
           />
 
           {[...Array(12)].map((_, index) => {
-            const angle = index * 30
-            const rad = ((angle - 90) * Math.PI) / 180
-            const x = 180 + Math.cos(rad) * 128
-            const y = 180 + Math.sin(rad) * 128
-            const label = index === 0 ? 12 : index
+            const angle = index * 30;
+            const rad = ((angle - 90) * Math.PI) / 180;
+            const x = 180 + Math.cos(rad) * 128;
+            const y = 180 + Math.sin(rad) * 128;
+            const label = index === 0 ? 12 : index;
 
             return (
               <text
@@ -89,7 +115,7 @@ export default function App() {
               >
                 {label}
               </text>
-            )
+            );
           })}
 
           <g transform={`rotate(${hourAngle} 180 180)`}>
@@ -140,12 +166,12 @@ export default function App() {
 
         <div className="digital-time">{digitalTime}</div>
 
-        <div className="countdown-label">{CLOCK_DATA.secondsToMidnight} seconds to midnight</div>
+        <div className="countdown-label">{clockData.secondsToMidnight} seconds to midnight</div>
 
-        <a className="source" href={CLOCK_DATA.sourceUrl} target="_blank" rel="noreferrer">
-          Last update: {CLOCK_DATA.lastUpdated} · {CLOCK_DATA.sourceName}
+        <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
+          Last update: {clockData.lastUpdated} · {clockData.sourceName}
         </a>
       </section>
     </main>
-  )
+  );
 }
