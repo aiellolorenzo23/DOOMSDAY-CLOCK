@@ -13,6 +13,7 @@ asarUnpack:
   - resources/**
 win:
   executableName: doomsday-clock
+  icon: src/renderer/src/assets/icon.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
