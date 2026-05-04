@@ -22,9 +22,9 @@ body,
 body {
   overflow: hidden;
   background:
-    radial-gradient(circle at center, rgba(255, 245, 160, 0.9), transparent 35%),
-    radial-gradient(circle at 68% 34%, rgba(140, 0, 0, 0.72) 0 4%, transparent 14%),
-    linear-gradient(145deg, var(--paper), var(--dirty-yellow) 65%, #211600);
+    linear-gradient(rgba(12, 5, 3, 0.38), rgba(12, 5, 3, 0.72)),
+    radial-gradient(circle at 50% 30%, rgba(255, 186, 104, 0.22), transparent 32%),
+    url("./mars-wp.png") center center / cover no-repeat;
   color: var(--ink-black);
   font-family: Impact, "Arial Black", system-ui, sans-serif;
 }
@@ -35,12 +35,13 @@ body {
   display: grid;
   place-items: center;
   isolation: isolate;
+  padding: 32px;
 }
 
 .clock-card {
   position: relative;
-  width: min(680px, 92vw);
-  min-height: min(880px, 92vh);
+  width: min(680px, calc(100vw - 64px));
+  min-height: min(880px, calc(100vh - 64px));
   border: 8px solid var(--ink-black);
   background: var(--watchmen-yellow);
   box-shadow:
