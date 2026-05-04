@@ -1,0 +1,255 @@
+:root {
+  --watchmen-yellow: #f5c400;
+  --dirty-yellow: #c99600;
+  --ink-black: #080808;
+  --blood-red: #9e0000;
+  --dark-red: #4f0000;
+  --paper: #f4df82;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(255, 245, 160, 0.9), transparent 35%),
+    radial-gradient(circle at 68% 34%, rgba(140, 0, 0, 0.72) 0 4%, transparent 14%),
+    linear-gradient(145deg, var(--paper), var(--dirty-yellow) 65%, #211600);
+  color: var(--ink-black);
+  font-family: Impact, "Arial Black", system-ui, sans-serif;
+}
+
+.app {
+  position: relative;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.clock-card {
+  position: relative;
+  width: min(680px, 92vw);
+  min-height: min(880px, 92vh);
+  border: 8px solid var(--ink-black);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.25), transparent 35%),
+    var(--watchmen-yellow);
+  box-shadow:
+    18px 18px 0 rgba(0, 0, 0, 0.45),
+    0 0 60px rgba(120, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.18);
+}
+
+.analog-clock {
+  filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.25));
+}
+
+.clock-number {
+  user-select: none;
+}
+
+.digital-time {
+  margin-top: 10px;
+  font-family: "Courier New", monospace;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: var(--ink-black);
+  color: var(--watchmen-yellow);
+  padding: 0.35rem 0.8rem;
+  border: 4px solid var(--blood-red);
+  box-shadow:
+    0 0 18px rgba(158, 0, 0, 0.7),
+    inset 0 0 16px rgba(158, 0, 0, 0.55);
+}
+
+.countdown-label {
+  font-size: clamp(1.1rem, 3vw, 1.7rem);
+  letter-spacing: 0.12em;
+  color: var(--blood-red);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.source {
+  color: var(--ink-black);
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.source:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.hand-wobble {
+  transform-box: view-box;
+  transform-origin: 180px 180px;
+}
+
+.hour-wobble {
+  animation: subtleWobble 4.5s infinite ease-in-out;
+}
+
+.minute-wobble {
+  animation: subtleWobble 3.2s infinite ease-in-out;
+}
+
+.second-wobble {
+  animation: secondTwitch 1s infinite steps(2, end);
+}
+
+@keyframes subtleWobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  45% {
+    transform: rotate(0.25deg);
+  }
+
+  55% {
+    transform: rotate(-0.25deg);
+  }
+}
+
+@keyframes secondTwitch {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-0.75deg);
+  }
+}
+
+.red-glow {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 65% 35%, rgba(158, 0, 0, 0.85), transparent 16%),
+    radial-gradient(circle at 50% 50%, rgba(80, 0, 0, 0.55), transparent 45%);
+  filter: blur(20px);
+  animation: redPulse 5s infinite ease-in-out;
+}
+
+@keyframes redPulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.08) 0,
+      rgba(0, 0, 0, 0.08) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+  animation: scanlineMove 9s linear infinite;
+}
+
+@keyframes scanlineMove {
+  from {
+    background-position-y: 0;
+  }
+
+  to {
+    background-position-y: 120px;
+  }
+}
+
+.clock-card {
+  animation: cardFlicker 6s infinite steps(1, end);
+}
+
+@keyframes cardFlicker {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  46% {
+    filter: brightness(1);
+  }
+
+  47% {
+    filter: brightness(0.94);
+  }
+
+  48% {
+    filter: brightness(1.08);
+  }
+
+  49% {
+    filter: brightness(1);
+  }
+
+  82% {
+    filter: brightness(1);
+  }
+
+  83% {
+    filter: brightness(0.96);
+  }
+
+  84% {
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-card,
+  .red-glow,
+  .scanlines,
+  .hour-wobble,
+  .minute-wobble,
+  .second-wobble {
+    animation: none;
+  }
+}
