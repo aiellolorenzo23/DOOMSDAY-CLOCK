@@ -132,6 +132,7 @@ export default function App() {
   const chaosIntervalRef = useRef<number | null>(null);
   const settlingTimeoutRef = useRef<number | null>(null);
   const viewTimeoutRef = useRef<number | null>(null);
+  const appRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     void refreshClockData();
@@ -232,6 +233,8 @@ export default function App() {
     viewTimeoutRef.current = window.setTimeout(() => {
       setView(nextView);
 
+      appRef.current?.scrollTo({ top: 0, behavior: "auto" });
+
       viewTimeoutRef.current = window.setTimeout(() => {
         setIsSwitchingView(false);
         viewTimeoutRef.current = null;
@@ -248,7 +251,7 @@ export default function App() {
     chaosState?.angles ?? getHandAngles(clockData.secondsToMidnight);
 
   return (
-    <main className="app">
+    <main ref={appRef} className={`app ${view === "timeline" ? "is-timeline" : ""}`}>
       <div className="red-glow" />
 
       <div className="action-buttons">
@@ -292,169 +295,167 @@ export default function App() {
         </button>
       </div>
 
-      <section className={`clock-card ${isSwitchingView ? "is-switching-view" : ""}`}>
-        <div className="scanlines" />
+      {view === "clock" ? (
+        <section className={`clock-card ${isSwitchingView ? "is-switching-view" : ""}`}>
+          <div className="scanlines" />
 
-        {view === "clock" ? (
-          <>
-            <header className="watchmen-title" aria-label="Doomsday Clock">
-              <div className="watchmen-title-main">DOOMSDAY</div>
-              <div className="watchmen-title-sub">CLOCK</div>
-            </header>
+          <header className="watchmen-title" aria-label="Doomsday Clock">
+            <div className="watchmen-title-main">DOOMSDAY</div>
+            <div className="watchmen-title-sub">CLOCK</div>
+          </header>
 
-            <svg
-              width="360"
-              height="360"
-              viewBox="0 0 360 360"
-              className={`analog-clock ${isRefreshing ? "is-refreshing" : ""}`}
+          <svg
+            width="360"
+            height="360"
+            viewBox="0 0 360 360"
+            className={`analog-clock ${isRefreshing ? "is-refreshing" : ""}`}
+          >
+            <circle cx="180" cy="180" r="160" fill="none" stroke="black" strokeWidth="10" />
+
+            <circle
+              cx="180"
+              cy="180"
+              r="148"
+              fill="none"
+              stroke="rgba(0, 0, 0, 0.25)"
+              strokeWidth="2"
+              strokeDasharray="4 8"
+            />
+
+            {[...Array(12)].map((_, index) => {
+              const angle = index * 30;
+              const rad = ((angle - 90) * Math.PI) / 180;
+              const x = 180 + Math.cos(rad) * 128;
+              const y = 180 + Math.sin(rad) * 128;
+              const label = index === 0 ? 12 : index;
+
+              return (
+                <text
+                  key={index}
+                  x={x}
+                  y={y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="28"
+                  fontWeight="900"
+                  className="clock-number"
+                >
+                  {label}
+                </text>
+              );
+            })}
+
+            <g
+              className={`hand-rotation hour-rotation ${isSettling ? "is-settling" : ""}`}
+              style={{ transform: `rotate(${hourAngle}deg)` }}
             >
-              <circle cx="180" cy="180" r="160" fill="none" stroke="black" strokeWidth="10" />
-
-              <circle
-                cx="180"
-                cy="180"
-                r="148"
-                fill="none"
-                stroke="rgba(0, 0, 0, 0.25)"
-                strokeWidth="2"
-                strokeDasharray="4 8"
-              />
-
-              {[...Array(12)].map((_, index) => {
-                const angle = index * 30;
-                const rad = ((angle - 90) * Math.PI) / 180;
-                const x = 180 + Math.cos(rad) * 128;
-                const y = 180 + Math.sin(rad) * 128;
-                const label = index === 0 ? 12 : index;
-
-                return (
-                  <text
-                    key={index}
-                    x={x}
-                    y={y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize="28"
-                    fontWeight="900"
-                    className="clock-number"
-                  >
-                    {label}
-                  </text>
-                );
-              })}
-
-              <g
-                className={`hand-rotation hour-rotation ${isSettling ? "is-settling" : ""}`}
-                style={{ transform: `rotate(${hourAngle}deg)` }}
-              >
-                <g className="hand-wobble hour-wobble">
-                  <line
-                    x1="180"
-                    y1="188"
-                    x2="180"
-                    y2="95"
-                    stroke="black"
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                  />
-                </g>
+              <g className="hand-wobble hour-wobble">
+                <line
+                  x1="180"
+                  y1="188"
+                  x2="180"
+                  y2="95"
+                  stroke="black"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                />
               </g>
+            </g>
 
-              <g
-                className={`hand-rotation minute-rotation ${isSettling ? "is-settling" : ""}`}
-                style={{ transform: `rotate(${minuteAngle}deg)` }}
-              >
-                <g className="hand-wobble minute-wobble">
-                  <line
-                    x1="180"
-                    y1="190"
-                    x2="180"
-                    y2="55"
-                    stroke="black"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
-                </g>
+            <g
+              className={`hand-rotation minute-rotation ${isSettling ? "is-settling" : ""}`}
+              style={{ transform: `rotate(${minuteAngle}deg)` }}
+            >
+              <g className="hand-wobble minute-wobble">
+                <line
+                  x1="180"
+                  y1="190"
+                  x2="180"
+                  y2="55"
+                  stroke="black"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
               </g>
+            </g>
 
-              <g
-                className={`hand-rotation second-rotation ${isSettling ? "is-settling" : ""}`}
-                style={{ transform: `rotate(${secondAngle}deg)` }}
-              >
-                <g className="hand-wobble second-wobble">
-                  <line
-                    x1="180"
-                    y1="200"
-                    x2="180"
-                    y2="42"
-                    stroke="#9e0000"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </g>
+            <g
+              className={`hand-rotation second-rotation ${isSettling ? "is-settling" : ""}`}
+              style={{ transform: `rotate(${secondAngle}deg)` }}
+            >
+              <g className="hand-wobble second-wobble">
+                <line
+                  x1="180"
+                  y1="200"
+                  x2="180"
+                  y2="42"
+                  stroke="#9e0000"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
               </g>
+            </g>
 
-              <circle cx="180" cy="180" r="10" fill="black" />
-              <circle cx="180" cy="180" r="4" fill="#9e0000" />
-            </svg>
+            <circle cx="180" cy="180" r="10" fill="black" />
+            <circle cx="180" cy="180" r="4" fill="#9e0000" />
+          </svg>
 
-            <div className={`digital-time ${isRefreshing ? "is-refreshing" : ""}`}>
-              {displayedDigitalTime}
-            </div>
+          <div className={`digital-time ${isRefreshing ? "is-refreshing" : ""}`}>
+            {displayedDigitalTime}
+          </div>
 
-            <div className={`countdown-label ${isRefreshing ? "is-refreshing" : ""}`}>
-              {displayedCountdown} seconds to midnight
-            </div>
+          <div className={`countdown-label ${isRefreshing ? "is-refreshing" : ""}`}>
+            {displayedCountdown} seconds to midnight
+          </div>
 
-            <div className="source-row">
-              <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
-                Last update: {clockData.lastUpdated} · {clockData.sourceName}
-              </a>
-              <span className={`source-status is-${clockData.fetchState}`}>
-                {getFetchStateLabel(clockData.fetchState)}
-              </span>
-            </div>
-          </>
-        ) : (
-          <>
-            <header className="watchmen-title timeline-title" aria-label="Doomsday Clock Timeline">
-              <div className="watchmen-title-main">TIMELINE</div>
-              <div className="watchmen-title-sub">CLOCK SHIFTS</div>
-            </header>
+          <div className="source-row">
+            <a className="source" href={clockData.sourceUrl} target="_blank" rel="noreferrer">
+              Last update: {clockData.lastUpdated} · {clockData.sourceName}
+            </a>
+            <span className={`source-status is-${clockData.fetchState}`}>
+              {getFetchStateLabel(clockData.fetchState)}
+            </span>
+          </div>
+        </section>
+      ) : (
+        <section className={`timeline-view ${isSwitchingView ? "is-switching-view" : ""}`}>
+          <header className="watchmen-title timeline-title" aria-label="Doomsday Clock Timeline">
+            <div className="watchmen-title-main">TIMELINE</div>
+            <div className="watchmen-title-sub">CLOCK SHIFTS</div>
+          </header>
 
-            <div className="timeline-panel">
-              {isTimelineLoading && timelineData.entries.length === 0 ? (
-                <div className="timeline-loading">loading timeline...</div>
-              ) : (
-                timelineData.entries.map((entry) => (
-                  <article className="timeline-entry" key={entry.year}>
-                    <div className="timeline-entry-header">
-                      <span className="timeline-year">{entry.year}</span>
-                      <span className="timeline-digital-time">
-                        {getClockTimeFromSecondsToMidnight(entry.secondsToMidnight)}
-                      </span>
-                    </div>
-                    <div className="timeline-countdown">
-                      {getCountdownLabel(entry.secondsToMidnight)}
-                    </div>
-                    <h2>{entry.title}</h2>
-                    <p>{entry.body}</p>
-                  </article>
-                ))
-              )}
-            </div>
+          <div className="timeline-panel">
+            {isTimelineLoading && timelineData.entries.length === 0 ? (
+              <div className="timeline-loading">loading timeline...</div>
+            ) : (
+              timelineData.entries.map((entry) => (
+                <article className="timeline-entry" key={entry.year}>
+                  <div className="timeline-entry-header">
+                    <span className="timeline-year">{entry.year}</span>
+                    <span className="timeline-digital-time">
+                      {getClockTimeFromSecondsToMidnight(entry.secondsToMidnight)}
+                    </span>
+                  </div>
+                  <div className="timeline-countdown">
+                    {getCountdownLabel(entry.secondsToMidnight)}
+                  </div>
+                  <h2>{entry.title}</h2>
+                  <p>{entry.body}</p>
+                </article>
+              ))
+            )}
+          </div>
 
-            <div className="source-row timeline-source-row">
-              <a className="source" href={timelineData.sourceUrl} target="_blank" rel="noreferrer">
-                Timeline: {timelineData.sourceName}
-              </a>
-              <span className={`source-status is-${timelineData.fetchState}`}>
-                {getFetchStateLabel(timelineData.fetchState)}
-              </span>
-            </div>
-          </>
-        )}
-      </section>
+          <div className="source-row timeline-source-row">
+            <a className="source" href={timelineData.sourceUrl} target="_blank" rel="noreferrer">
+              Timeline: {timelineData.sourceName}
+            </a>
+            <span className={`source-status is-${timelineData.fetchState}`}>
+              {getFetchStateLabel(timelineData.fetchState)}
+            </span>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
