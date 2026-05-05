@@ -295,7 +295,7 @@ body {
 
 .timeline-title .watchmen-title-main {
   font-size: clamp(4.1rem, 8.4vw, 6.6rem);
-  letter-spacing: -0.055em;
+  letter-spacing: -0.005em;
 }
 
 .timeline-title .watchmen-title-sub {
