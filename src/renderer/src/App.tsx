@@ -128,6 +128,9 @@ export default function App() {
   const [isSettling, setIsSettling] = useState(false);
   const [isTimelineLoading, setIsTimelineLoading] = useState(false);
   const [isSwitchingView, setIsSwitchingView] = useState(false);
+  const [viewTransitionPhase, setViewTransitionPhase] = useState<"idle" | "exiting" | "entering">(
+    "idle"
+  );
   const [chaosState, setChaosState] = useState<ChaosState | null>(null);
   const chaosIntervalRef = useRef<number | null>(null);
   const settlingTimeoutRef = useRef<number | null>(null);
@@ -163,6 +166,11 @@ export default function App() {
       window.clearTimeout(viewTimeoutRef.current);
       viewTimeoutRef.current = null;
     }
+  }
+
+  function resetAppScroll() {
+    appRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
 
   function startChaos() {
@@ -229,16 +237,19 @@ export default function App() {
 
     stopViewTransition();
     setIsSwitchingView(true);
+    setViewTransitionPhase("exiting");
 
     viewTimeoutRef.current = window.setTimeout(() => {
       setView(nextView);
-
-      appRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      resetAppScroll();
+      setViewTransitionPhase("entering");
+      window.requestAnimationFrame(resetAppScroll);
 
       viewTimeoutRef.current = window.setTimeout(() => {
+        setViewTransitionPhase("idle");
         setIsSwitchingView(false);
         viewTimeoutRef.current = null;
-      }, 560);
+      }, 360);
     }, 220);
   }
 
@@ -296,7 +307,7 @@ export default function App() {
       </div>
 
       {view === "clock" ? (
-        <section className={`clock-card ${isSwitchingView ? "is-switching-view" : ""}`}>
+        <section className={`clock-card is-${viewTransitionPhase}`}>
           <div className="scanlines" />
 
           <header className="watchmen-title" aria-label="Doomsday Clock">
@@ -418,7 +429,7 @@ export default function App() {
           </div>
         </section>
       ) : (
-        <section className={`timeline-view ${isSwitchingView ? "is-switching-view" : ""}`}>
+        <section className={`timeline-view is-${viewTransitionPhase}`}>
           <header className="watchmen-title timeline-title" aria-label="Doomsday Clock Timeline">
             <div className="watchmen-title-main">TIMELINE</div>
             <div className="watchmen-title-sub">CLOCK SHIFTS</div>

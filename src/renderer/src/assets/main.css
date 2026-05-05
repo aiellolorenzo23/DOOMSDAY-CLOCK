@@ -236,12 +236,22 @@ body {
     filter 220ms ease;
 }
 
-.clock-card.is-switching-view {
-  animation: viewSwitch 780ms steps(2, end);
+.clock-card.is-exiting,
+.timeline-view.is-exiting {
+  animation: viewExit 220ms ease-in forwards;
 }
 
-.timeline-view.is-switching-view {
-  animation: timelineViewSwitch 780ms steps(2, end);
+.clock-card.is-entering,
+.timeline-view.is-entering {
+  animation: viewEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.timeline-view.is-exiting {
+  animation-name: timelineViewExit;
+}
+
+.timeline-view.is-entering {
+  animation-name: timelineViewEnter;
 }
 
 .clock-card::before {
@@ -871,23 +881,25 @@ body {
   }
 }
 
-@keyframes viewSwitch {
+@keyframes viewExit {
   0% {
     opacity: 1;
     transform: rotate(-1deg) translateX(0) scale(1);
     filter: brightness(1);
   }
 
-  22% {
+  100% {
     opacity: 0;
     transform: rotate(-1deg) translateX(-34px) scale(0.96);
-    filter: brightness(0.72) contrast(1.35);
+    filter: brightness(0.78) contrast(1.28);
   }
+}
 
-  46% {
+@keyframes viewEnter {
+  0% {
     opacity: 0;
-    transform: rotate(1.2deg) translateX(34px) scale(0.96);
-    filter: brightness(0.8) contrast(1.45);
+    transform: rotate(-1deg) translateX(34px) scale(0.96);
+    filter: brightness(0.84) contrast(1.18);
   }
 
   100% {
@@ -897,23 +909,25 @@ body {
   }
 }
 
-@keyframes timelineViewSwitch {
+@keyframes timelineViewExit {
   0% {
     opacity: 1;
     transform: translateX(0) scale(1);
     filter: brightness(1);
   }
 
-  22% {
+  100% {
     opacity: 0;
     transform: translateX(-34px) scale(0.98);
-    filter: brightness(0.72) contrast(1.35);
+    filter: brightness(0.78) contrast(1.28);
   }
+}
 
-  46% {
+@keyframes timelineViewEnter {
+  0% {
     opacity: 0;
     transform: translateX(34px) scale(0.98);
-    filter: brightness(0.8) contrast(1.45);
+    filter: brightness(0.84) contrast(1.18);
   }
 
   100% {
@@ -940,8 +954,10 @@ body {
   .countdown-label.is-refreshing,
   .refresh-button.is-refreshing,
   .timeline-button.is-switching,
-  .clock-card.is-switching-view,
-  .timeline-view.is-switching-view {
+  .clock-card.is-exiting,
+  .clock-card.is-entering,
+  .timeline-view.is-exiting,
+  .timeline-view.is-entering {
     animation: none;
   }
 }
