@@ -269,16 +269,23 @@ export default function App() {
 
         <button
           type="button"
-          className={`action-button timeline-button ${isSwitchingView ? "is-switching" : ""}`}
+          className={`action-button timeline-button ${view === "timeline" ? "is-clock-button" : ""} ${isSwitchingView ? "is-switching" : ""}`}
           onClick={toggleTimelineView}
           aria-label={view === "clock" ? "timeline" : "clock"}
           disabled={isSwitchingView}
         >
-          <span className="timeline-button-icon" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
+          {view === "clock" ? (
+            <span className="timeline-button-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          ) : (
+            <span className="clock-button-icon" aria-hidden="true">
+              <span className="clock-button-hour" />
+              <span className="clock-button-minute" />
+            </span>
+          )}
           <span className="action-button-tooltip">
             {view === "clock" ? "timeline" : "clock"}
           </span>
