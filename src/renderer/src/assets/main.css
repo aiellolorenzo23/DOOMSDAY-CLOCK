@@ -136,6 +136,42 @@ body {
   top: 33px;
 }
 
+.clock-button-icon {
+  position: relative;
+  display: inline-flex;
+  width: 52px;
+  height: 52px;
+  border: 4px solid var(--watchmen-yellow);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--watchmen-yellow) 0 4px, transparent 5px),
+    rgba(245, 196, 0, 0.08);
+  box-shadow:
+    inset 0 0 0 3px rgba(158, 0, 0, 0.45),
+    2px 2px 0 rgba(158, 0, 0, 0.8);
+}
+
+.clock-button-hour,
+.clock-button-minute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  background: var(--watchmen-yellow);
+  border-radius: 999px;
+  transform-origin: 50% 100%;
+}
+
+.clock-button-hour {
+  height: 15px;
+  transform: translate(-50%, -100%) rotate(-52deg);
+}
+
+.clock-button-minute {
+  height: 21px;
+  transform: translate(-50%, -100%) rotate(0deg);
+}
+
 .action-button-tooltip {
   position: absolute;
   top: 50%;
@@ -850,6 +886,22 @@ body {
     width: 38px;
     height: 38px;
     border-width: 3px;
+  }
+
+  .clock-button-icon {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .clock-button-hour {
+    height: 12px;
+    width: 3px;
+  }
+
+  .clock-button-minute {
+    height: 16px;
+    width: 3px;
   }
 
   .timeline-button-icon span {
