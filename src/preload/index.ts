@@ -3,7 +3,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  getDoomsdayClockData: () => ipcRenderer.invoke('doomsday-clock:get-data')
+  getDoomsdayClockData: () => ipcRenderer.invoke('doomsday-clock:get-data'),
+  getDoomsdayTimeline: () => ipcRenderer.invoke('doomsday-clock:get-timeline')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
