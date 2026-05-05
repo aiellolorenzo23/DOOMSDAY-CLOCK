@@ -310,7 +310,7 @@ body {
   transform-origin: center;
   font-size: clamp(5.3rem, 10.2vw, 7.7rem);
   line-height: 0.78;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.045em;
 }
 
 .watchmen-title-sub {
